@@ -1,45 +1,47 @@
 # -*- coding: utf-8 -*-
 # Decision Tree Classifier
 # Copyright 2019 Denis Rothman MIT License. See LICENSE in GitHub directory.
-import pandas as pd #data processing
-from sklearn.tree import DecisionTreeClassifier #the dt classifier
-from sklearn.model_selection import train_test_split  #split the data into training data and testing data
-from sklearn import metrics #measure prediction performance  
-import pickle #save and load estimator models
+import pandas as pd  # data processing
+from sklearn.tree import DecisionTreeClassifier  # the dt classifier
+# split the data into training data and testing data
+from sklearn.model_selection import train_test_split
+from sklearn import metrics  # measure prediction performance
+import pickle  # save and load estimator models
 
-#loading dataset
-col_names = ['f1', 'f2','label']
+# loading dataset
+col_names = ['f1', 'f2', 'label']
 df = pd.read_csv("ckmc.csv", header=None, names=col_names)
 
 print(df.head())
 
-#defining features and label (classes)
+# defining features and label (classes)
 feature_cols = ['f1', 'f2']
-X = df[feature_cols] # Features
-y = df.label # Target variable
+X = df[feature_cols]  # Features
+y = df.label  # Target variable
 
 print(X)
 
 print(y)
 
 # splitting df (dataset) into training and testing data
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=1) # 70% training and 30% test
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.3, random_state=1)  # 70% training and 30% test
 
 # create the decision tree classifier
 dtc = DecisionTreeClassifier()
 
 # train the decision tree
-dtc = dtc.fit(X_train,y_train)
+dtc = dtc.fit(X_train, y_train)
 
-#predictions on X_test
+# predictions on X_test
 print("prediction")
 y_pred = dtc.predict(X_test)
 print(y_pred)
 
 # model accuracy
-print("Accuracy:",metrics.accuracy_score(y_test, y_pred))
+print("Accuracy:", metrics.accuracy_score(y_test, y_pred))
 
-#save model
+# save model
 pickle.dump(dtc, open("dt.sav", 'wb'))
 
 

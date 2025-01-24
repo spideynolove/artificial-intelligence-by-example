@@ -34,41 +34,41 @@ from PIL import Image
 # I.Markov Decision Process (MDP) - The Bellman equations adapted to
 # Reinforcement Learning with the Q action-value(reward) function.
 
-L=['A','B','C','D','E','F']
-#initial weight of nodes(vertices) with no edges directions (undirected graph)
-W=[0,0,0,0,0,0]
+L = ['A', 'B', 'C', 'D', 'E', 'F']
+# initial weight of nodes(vertices) with no edges directions (undirected graph)
+W = [0, 0, 0, 0, 0, 0]
 # R is The Reward Matrix for each state built on the physical graph
 # Ri is a memory of this initial state: no rewards and undirected
-R = ql.matrix([ [0,0,0,0,1,0],
-		[0,0,0,1,0,1],
-		[0,0,0,1,0,0],
-		[0,1,1,0,1,0],
-		[1,0,0,1,0,0],
-		[0,1,0,0,0,0] ])
+R = ql.matrix([[0, 0, 0, 0, 1, 0],
+               [0, 0, 0, 1, 0, 1],
+               [0, 0, 0, 1, 0, 0],
+               [0, 1, 1, 0, 1, 0],
+               [1, 0, 0, 1, 0, 0],
+               [0, 1, 0, 0, 0, 0]])
 
-Ri = ql.matrix([ [0,0,0,0,1,0],
-		[0,0,0,1,0,1],
-		[0,0,0,1,0,0],
-		[0,1,1,0,1,0],
-		[1,0,0,1,0,0],
-		[0,1,0,0,0,0] ])
+Ri = ql.matrix([[0, 0, 0, 0, 1, 0],
+                [0, 0, 0, 1, 0, 1],
+                [0, 0, 0, 1, 0, 0],
+                [0, 1, 1, 0, 1, 0],
+                [1, 0, 0, 1, 0, 0],
+                [0, 1, 0, 0, 0, 0]])
 
 
 # Q is the Learning Matrix in which rewards will be learned/stored
-Q = ql.matrix(ql.zeros([6,6]))
+Q = ql.matrix(ql.zeros([6, 6]))
 
 
-#II. Convolutional Neural Network (CNN)
-#loads,traffic,food processing
-A=['dataset_O/','dataset_traffic/','dataset/']
-MS1=['loaded','jammed','full']
-MS2=['unloaded','change','available']
+# II. Convolutional Neural Network (CNN)
+# loads,traffic,food processing
+A = ['dataset_O/', 'dataset_traffic/', 'dataset/']
+MS1 = ['loaded', 'jammed', 'full']
+MS2 = ['unloaded', 'change', 'available']
 
-display=1     #display images
-scenario=2    #reference to A,MS1,MS2
-directory=A[scenario] #transfer learning parameter (choice of images)
-CRLMN=1       # concept learning
-print("Classifier frame directory",directory)
+display = 1  # display images
+scenario = 2  # reference to A,MS1,MS2
+directory = A[scenario]  # transfer learning parameter (choice of images)
+CRLMN = 1       # concept learning
+print("Classifier frame directory", directory)
 
 # Learning over n iterations depending on the convergence of the system
 # A convergence function can replace the systematic repeating of the process
@@ -82,24 +82,28 @@ print("Classifier frame directory",directory)
 #
 #
 #
-#____________________LOAD MODEL____________________________
+# ____________________LOAD MODEL____________________________
 loaded_model = keras.models.load_model(directory+"model/model3.h5")
 print(loaded_model.summary())
 # __________________compile loaded model
-loaded_model.compile(loss='binary_crossentropy', optimizer='rmsprop', metrics=['accuracy'])
+loaded_model.compile(loss='binary_crossentropy',
+                     optimizer='rmsprop', metrics=['accuracy'])
 
-#___________________IDENTIFY IMAGE FUNCTION_____________________
-def identify(target_image,e):
+# ___________________IDENTIFY IMAGE FUNCTION_____________________
+
+
+def identify(target_image, e):
     filename = target_image
     original = load_img(filename, target_size=(64, 64))
-    #print('PIL image size',original.size)
-    fn=str(e)
-    if(display==1):
+    # print('PIL image size',original.size)
+    fn = str(e)
+    if (display == 1):
         plt.subplot(111)
         plt.imshow(original)
-        #CRL-MM #M
-        plt.title('A webcam freezes a frame of a parking lot.'+ '\n' + 'The frame then becomes the input of a trained TensorFlow 2 CNN.' +'\n'+'The output will classify the frame as a suitable parking lot or not.',fontname='Arial', fontsize=10)
-        #plt.text(0.1,2, "The frame is the input of a trained CNN")
+        # CRL-MM #M
+        plt.title('A webcam freezes a frame of a parking lot.' + '\n' + 'The frame then becomes the input of a trained TensorFlow 2 CNN.' +
+                  '\n'+'The output will classify the frame as a suitable parking lot or not.', fontname='Arial', fontsize=10)
+        # plt.text(0.1,2, "The frame is the input of a trained CNN")
         '''
         plt.show(block=False)
         time.sleep(5)
@@ -107,16 +111,19 @@ def identify(target_image,e):
         '''
         plt.show()
     numpy_image = img_to_array(original)
-    inputarray = numpy_image[ql.newaxis,...] # extra dimension to fit model
-    arrayresized=ql.resize(inputarray,(64,64))
-#___________________PREDICTION___________________________
+    inputarray = numpy_image[ql.newaxis, ...]  # extra dimension to fit model
+    arrayresized = ql.resize(inputarray, (64, 64))
+# ___________________PREDICTION___________________________
     prediction = loaded_model.predict_proba(inputarray)
-    print("image",target_image,"predict_probability:",prediction)
+    print("image", target_image, "predict_probability:", prediction)
     return prediction
-#I._________________MARKOV DECISION PROCESS_______________
-#Logistic Signmoid function to squash the weights
+# I._________________MARKOV DECISION PROCESS_______________
+# Logistic Signmoid function to squash the weights
+
+
 def logistic_sigmoid(w):
-  return 1 / (1 + math.exp(-w))
+    return 1 / (1 + math.exp(-w))
+
 
 # Gamma : It's a form of penalty or uncertainty for learning
 # If the value is 1 , the rewards would be too high.
@@ -130,22 +137,28 @@ gamma = 0.8
 agent_s_state = 1
 
 # The possible "a" actions when the agent is in a given state
+
+
 def possible_actions(state):
     current_state_row = R[state,]
-    possible_act = ql.where(current_state_row >0)[1]
+    possible_act = ql.where(current_state_row > 0)[1]
     return possible_act
+
 
 # Get available actions in the current state
 PossibleAction = possible_actions(agent_s_state)
 
 # This function chooses at random which action to be performed within the range
 # of all the available actions.
+
+
 def ActionChoice(available_actions_range):
-    if(sum(PossibleAction)>0):
-        next_action = int(ql.random.choice(PossibleAction,1))
-    if(sum(PossibleAction)<=0):
-        next_action = int(ql.random.choice(5,1))
+    if (sum(PossibleAction) > 0):
+        next_action = int(ql.random.choice(PossibleAction, 1))
+    if (sum(PossibleAction) <= 0):
+        next_action = int(ql.random.choice(5, 1))
     return next_action
+
 
 # Sample next action to be performed
 action = ActionChoice(PossibleAction)
@@ -155,11 +168,12 @@ action = ActionChoice(PossibleAction)
 # The transition function T from one state to another
 # is not in the equation below.  T is done by the random choice above
 
+
 def reward(current_state, action, gamma):
     Max_State = ql.where(Q[action,] == ql.max(Q[action,]))[1]
 
     if Max_State.shape[0] > 1:
-        Max_State = int(ql.random.choice(Max_State, size = 1))
+        Max_State = int(ql.random.choice(Max_State, size=1))
     else:
         Max_State = int(Max_State)
     MaxValue = Q[action, Max_State]
@@ -167,73 +181,80 @@ def reward(current_state, action, gamma):
     # Bellman's MDP based Q function
     Q[current_state, action] = R[current_state, action] + gamma * MaxValue
 
+
 # Rewarding Q matrix
-reward(agent_s_state,action,gamma)
+reward(agent_s_state, action, gamma)
 
 
-#I CNN AND II MDP form a type of DQN (Deep Q Network):
-#A. frame of a stream (video or other) goes through a trained CNN
-#B. an optimizing function guides the MDP to an efficient target
-#C. The MDP optimizes the process
-def CRLMM(Q,lr,e,a):
+# I CNN AND II MDP form a type of DQN (Deep Q Network):
+# A. frame of a stream (video or other) goes through a trained CNN
+# B. an optimizing function guides the MDP to an efficient target
+# C. The MDP optimizes the process
+def CRLMM(Q, lr, e, a):
     # Displaying Q before the norm of Q phase
     print("Q  :")
     print(Q)
     # Norm of Q
     print("Normed Q :")
     print(Q/ql.max(Q)*100)
-    #Graph structure
-    RL=['','','','','','']
-    RN=[0,0,0,0,0,0]
-    print("State of frame(safety rating of each segment of the graph) :",lr,L[lr])
+    # Graph structure
+    RL = ['', '', '', '', '', '']
+    RN = [0, 0, 0, 0, 0, 0]
+    print(
+        "State of frame(safety rating of each segment of the graph) :", lr, L[lr])
     for i in range(6):
-        maxw=0
+        maxw = 0
         for j in range(6):
-            W[j]+=logistic_sigmoid(Q[i,j])
-            if(Q[i,j]>maxw):
-                RL[i]=L[j]
-                RN[i]=Q[i,j]
-                maxw=Q[i,j]
-                print(i,L[i],RL[i],RN[i])
-    #CRM-MM #M
-    status=random.randint(0,10)
-    if(status>5):
-        status=1
-    if(status<=5):
-        status=0
-    if(a>0 and status==0):
-        #add an available search function here that scans all the
-        #webcams of then network until it finds one that suits the model (not too far parameter and available)
-        status=1
-    if(status==0):
-      #Add frame from video stream (connect to webcam)
-      s=identify(directory+'classify/img1.jpg',e)
-    if(status==1):
-      #Add frame from video stream (connect to webcam)
-      s=identify(directory+'classify/img2.jpg',e)
-    s1=int(s[0])
-    if (int(s1)==0):
-      print('Classified in class A')
-      print(MS1[scenario])
-      print('Seeking...')
-    if (int(s1)==1):
-      print('Classified in class B')
-      print(MS2[scenario])
+            W[j] += logistic_sigmoid(Q[i, j])
+            if (Q[i, j] > maxw):
+                RL[i] = L[j]
+                RN[i] = Q[i, j]
+                maxw = Q[i, j]
+                print(i, L[i], RL[i], RN[i])
+    # CRM-MM #M
+    status = random.randint(0, 10)
+    if (status > 5):
+        status = 1
+    if (status <= 5):
+        status = 0
+    if (a > 0 and status == 0):
+        # add an available search function here that scans all the
+        # webcams of then network until it finds one that suits the model (not too far parameter and available)
+        status = 1
+    if (status == 0):
+        # Add frame from video stream (connect to webcam)
+        s = identify(directory+'classify/img1.jpg', e)
+    if (status == 1):
+        # Add frame from video stream (connect to webcam)
+        s = identify(directory+'classify/img2.jpg', e)
+    s1 = int(s[0])
+    if (int(s1) == 0):
+        print('Classified in class A')
+        print(MS1[scenario])
+        print('Seeking...')
+    if (int(s1) == 1):
+        print('Classified in class B')
+        print(MS2[scenario])
     return s1
 
-#Displaying the Weights
-def MDP_CRL_graph(W,t):
-  Y=[1,2,3,4,5,6]
-  h=int(round(max(W),3))+2
+# Displaying the Weights
 
-  fig,ax=plt.subplots()
-  plt.bar(Y,W)
-  plt.xticks(range(0,7))
-  plt.yticks(range(0,h))
-  #CRL-MM #M
-  plt.xticks(Y,('A','B','C','D','E','F'))
-  plt.title('The Vertex Weights(safest route) are UPDATED after the MDP for: '+L[t],fontname='Arial', fontsize=10)
-  plt.show()
+
+def MDP_CRL_graph(W, t):
+    Y = [1, 2, 3, 4, 5, 6]
+    h = int(round(max(W), 3))+2
+
+    fig, ax = plt.subplots()
+    plt.bar(Y, W)
+    plt.xticks(range(0, 7))
+    plt.yticks(range(0, h))
+    # CRL-MM #M
+    plt.xticks(Y, ('A', 'B', 'C', 'D', 'E', 'F'))
+    plt.title('The Vertex Weights(safest route) are UPDATED after the MDP for: ' +
+              L[t], fontname='Arial', fontsize=10)
+    plt.show()
+
+
 '''
   plt.show(block=False)
   time.sleep(5)
@@ -241,93 +262,95 @@ def MDP_CRL_graph(W,t):
 '''
 
 
-#Displaying the MDP graph
-def MDP_GRAPH(x,e):
-  verts1 = [
-      (1., 0.8),  # F
-      (0.6, 0.7), # B
-      (0.4, 0.3), # D
-      (0.8, 0.),  # C
-      ]
+# Displaying the MDP graph
+def MDP_GRAPH(x, e):
+    verts1 = [
+        (1., 0.8),  # F
+        (0.6, 0.7),  # B
+        (0.4, 0.3),  # D
+        (0.8, 0.),  # C
+    ]
 
-  codes1 = [Path.MOVETO,
-           Path.MOVETO,
-           Path.MOVETO,
-           Path.MOVETO,
-           ]
+    codes1 = [Path.MOVETO,
+              Path.MOVETO,
+              Path.MOVETO,
+              Path.MOVETO,
+              ]
 
-  fig = plt.figure()
-  ax = fig.add_subplot(111)
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
 
-  path1 = Path(verts1, codes1)
-  patch1 = patches.PathPatch(path1, facecolor='none', lw=2)
-  ax.add_patch(patch1)
+    path1 = Path(verts1, codes1)
+    patch1 = patches.PathPatch(path1, facecolor='none', lw=2)
+    ax.add_patch(patch1)
 
-  verts2 = [
-      (0.2, 1.),  # A
-      (0., 0.),   # E
-      (0.4, 0.3), # D
-      ]
+    verts2 = [
+        (0.2, 1.),  # A
+        (0., 0.),   # E
+        (0.4, 0.3),  # D
+    ]
 
-  codes2 = [Path.MOVETO,
-           Path.MOVETO,
-           Path.MOVETO,
-           ]
+    codes2 = [Path.MOVETO,
+              Path.MOVETO,
+              Path.MOVETO,
+              ]
 
-  path2 = Path(verts2, codes2)
-  patch2 = patches.PathPatch(path2, facecolor='none', lw=2)
-  ax.add_patch(patch2)
+    path2 = Path(verts2, codes2)
+    patch2 = patches.PathPatch(path2, facecolor='none', lw=2)
+    ax.add_patch(patch2)
 
-  tvc1='green'
-  if(x==1 or x==2 or x==5 or x==3):
-    tvc1='red'
+    tvc1 = 'green'
+    if (x == 1 or x == 2 or x == 5 or x == 3):
+        tvc1 = 'red'
 
-  tvc2='green'
-  if(x==0 or x==4):
-    tvc2='red'
+    tvc2 = 'green'
+    if (x == 0 or x == 4):
+        tvc2 = 'red'
 
-  vtit=L[x]
+    vtit = L[x]
 
-  xs1, ys1 = zip(*verts1)
-  ax.plot(xs1, ys1, 'o--', lw=2, color=tvc1, ms=10)
+    xs1, ys1 = zip(*verts1)
+    ax.plot(xs1, ys1, 'o--', lw=2, color=tvc1, ms=10)
 
-  xs2, ys2 = zip(*verts2)
-  ax.plot(xs2, ys2, 'o--', lw=2, color=tvc2, ms=10)
+    xs2, ys2 = zip(*verts2)
+    ax.plot(xs2, ys2, 'o--', lw=2, color=tvc2, ms=10)
 
-  ax.text(-0.05, -0.05, 'E')
-  ax.text(0.15, 1.05, 'A')
-  ax.text(1.05, 0.85, 'F')
-  ax.text(0.85, -0.05, 'C')
-  ax.text(0.6, 0.75, 'B')
-  ax.text(0.4, 0.35, 'D')
+    ax.text(-0.05, -0.05, 'E')
+    ax.text(0.15, 1.05, 'A')
+    ax.text(1.05, 0.85, 'F')
+    ax.text(0.85, -0.05, 'C')
+    ax.text(0.6, 0.75, 'B')
+    ax.text(0.4, 0.35, 'D')
 
-  fn=str(e)
-  #CRL-MM #M
-  plt.title('CRL-MDP OPTIMIZES VERTEX  '+ vtit + '\n'+ 'The optimizer chose the SAFEST vertex in the red network)'+ '\n'+ 'MDP will output route point preferences for Google Maps',fontname='Arial', fontsize=10)
+    fn = str(e)
+    # CRL-MM #M
+    plt.title('CRL-MDP OPTIMIZES VERTEX  ' + vtit + '\n' + 'The optimizer chose the SAFEST vertex in the red network)' +
+              '\n' + 'MDP will output route point preferences for Google Maps', fontname='Arial', fontsize=10)
 
-  ax.set_xlim(-0.1, 1.1)
-  ax.set_ylim(-0.1, 1.1)
+    ax.set_xlim(-0.1, 1.1)
+    ax.set_ylim(-0.1, 1.1)
 
-  '''
+    '''
   plt.show(block=False)
   time.sleep(5)
   plt.close()
   '''
-  plt.show()
+    plt.show()
+
 
 def SAFE_SVM():
-    #This function comes from the scikit
-    #However it's use in this innovating way, makes it protected as such when
-    #when used in this process (see copyright header)
+    # This function comes from the scikit
+    # However it's use in this innovating way, makes it protected as such when
+    # when used in this process (see copyright header)
 
-    #100 cars clusters(concentration of cars) represented
+    # 100 cars clusters(concentration of cars) represented
     X, y = make_blobs(n_samples=100, centers=2, random_state=7)
 
     # the model is directly fitted. The goal is a global estimate
     clf = svm.SVC(kernel='linear', C=1000)
     clf.fit(X, y)
 
-    #plot created
+    # plot created
     plt.scatter(X[:, 0], X[:, 1], c=y, s=30, cmap=plt.cm.Paired)
 
     # plot the SVM decision areas
@@ -344,12 +367,13 @@ def SAFE_SVM():
 
     # safe zone
     ax.contour(XX, YY, Z, colors='k', levels=[-1, 0, 1], alpha=0.5,
-           linestyles=['--', '-', '--'])
+               linestyles=['--', '-', '--'])
     # SVM support vectors
     ax.scatter(clf.support_vectors_[:, 0], clf.support_vectors_[:, 1], s=100,
-           linewidth=1, facecolors='none')
+               linewidth=1, facecolors='none')
 
-    plt.title('SVM sends a SAFE PATH passage even if it takes p% longer'+ '\n'+ 'It is used as an input for the itinerary graph',fontname='Arial', fontsize=10)
+    plt.title('SVM sends a SAFE PATH passage even if it takes p% longer' + '\n' +
+              'It is used as an input for the itinerary graph', fontname='Arial', fontsize=10)
     plt.show()
     '''
     plt.show(block=False)
@@ -360,116 +384,120 @@ def SAFE_SVM():
 # The DQN : a trained CNN + GAP optimization + MDP repeated as long as the stream inputs data
 # The episodes are the input frames
 
-episodes=2    #input frames
-crlmm=1000    #waiting state
-#input_output_frequency : output every n frames/ retained memory
-oif=10
-#input_output_rate p% (memory retained)
-oir=0.2
-fc=0 #frequencey counter : memory output
-for e in range(episodes):
-  print("episode:frame #",e)
-  fc=fc+1
-  #target recaclulated for each episode
-  lr=0
 
-  #first episode is random
-  if(e==0):
-    lr=random.randint(0,5)
-  #if episode>1, then min or max
-  #BEGINNING OF GAP OPTIMIZATION PROCESS : a key real-time function
-  #in this model, min is the target but max could fit another model
-  if(e>0):
-    lr=0
-    minw=10000000
-    maxw=-1
-    '''
+episodes = 2  # input frames
+crlmm = 1000  # waiting state
+# input_output_frequency : output every n frames/ retained memory
+oif = 10
+# input_output_rate p% (memory retained)
+oir = 0.2
+fc = 0  # frequencey counter : memory output
+for e in range(episodes):
+    print("episode:frame #", e)
+    fc = fc+1
+    # target recaclulated for each episode
+    lr = 0
+
+    # first episode is random
+    if (e == 0):
+        lr = random.randint(0, 5)
+    # if episode>1, then min or max
+    # BEGINNING OF GAP OPTIMIZATION PROCESS : a key real-time function
+    # in this model, min is the target but max could fit another model
+    if (e > 0):
+        lr = 0
+        minw = 10000000
+        maxw = -1
+        '''
     CRL-MM-IOT #1 : search for a safe vertex with parking space
     '''
-    #CRL-MM-IOT #3 not optimizing loads
-    #no space => no parking space
-    for search in range(1000):
-        if(crlmm==0):
-            full = load_img("FULL.JPG")
-            plt.subplot(111)
-            plt.imshow(full)
-            plt.title('PARKING LOT STATUS : This parking lot is full.' +'\n'+'Another webcam is consulted',fontname='Arial', fontsize=10)
-            #plt.text(0.1,2, "The frame is the input of a trained CNN")
-            plt.show()
-            '''
+        # CRL-MM-IOT #3 not optimizing loads
+        # no space => no parking space
+        for search in range(1000):
+            if (crlmm == 0):
+                full = load_img("FULL.JPG")
+                plt.subplot(111)
+                plt.imshow(full)
+                plt.title('PARKING LOT STATUS : This parking lot is full.' + '\n' +
+                          'Another webcam is consulted', fontname='Arial', fontsize=10)
+                # plt.text(0.1,2, "The frame is the input of a trained CNN")
+                plt.show()
+                '''
             plt.show(block=False)
             time.sleep(5)
             plt.close()
             '''
-            print("This parking lot is full, searching...")
-            if(search>2):
-                a=1
-            crlmm=CRLMM(Q,lr,e,a)
-            if(crlmm==1):
-                a=0
-                break
-    #space found
-    if(crlmm==1):
-        available = load_img("AVAILABLE.JPG")
-        plt.subplot(111)
-        plt.imshow(available)
-        plt.title('PARKING LOT STATUS : This parking lot has available space.' +'\n'+'Now an SVM will suggest a safe route ',fontname='Arial', fontsize=10)
-        #plt.text(0.1,2, "The frame is the input of a trained CNN"
-        plt.show()
-        '''
+                print("This parking lot is full, searching...")
+                if (search > 2):
+                    a = 1
+                crlmm = CRLMM(Q, lr, e, a)
+                if (crlmm == 1):
+                    a = 0
+                    break
+        # space found
+        if (crlmm == 1):
+            available = load_img("AVAILABLE.JPG")
+            plt.subplot(111)
+            plt.imshow(available)
+            plt.title('PARKING LOT STATUS : This parking lot has available space.' +
+                      '\n'+'Now an SVM will suggest a safe route ', fontname='Arial', fontsize=10)
+            # plt.text(0.1,2, "The frame is the input of a trained CNN"
+            plt.show()
+            '''
         plt.show(block=False)
         time.sleep(5)
         plt.close()
         '''
-        print("This parking lot has available space...")
-        SAFE_SVM()
-        print("SAFE PASSAGE SUGGESTED")
-        MDP_GRAPH(lr,e)
-        print("Vertex Weights",W)
-        MDP_CRL_graph(W,lr)
-        for wi in range(6):
-            op=random.randint(0,5)
-            if(W[op]>maxw):
-                lr=op;maxw=W[op]
+            print("This parking lot has available space...")
+            SAFE_SVM()
+            print("SAFE PASSAGE SUGGESTED")
+            MDP_GRAPH(lr, e)
+            print("Vertex Weights", W)
+            MDP_CRL_graph(W, lr)
+            for wi in range(6):
+                op = random.randint(0, 5)
+                if (W[op] > maxw):
+                    lr = op
+                    maxw = W[op]
 
-  print("LR TARGET STATE MDP number and letter:",lr,L[lr])
-  #initial reward matrix set again
-  for ei in range(6):
-    for ej in range(6):
-      Q[ei,ej]=0
-      if(ei !=lr):
-        R[ei,ej]=Ri[ei,ej]
-      if(ei ==lr):
-        R[ei,ej]=0 #to target, not from
+    print("LR TARGET STATE MDP number and letter:", lr, L[lr])
+    # initial reward matrix set again
+    for ei in range(6):
+        for ej in range(6):
+            Q[ei, ej] = 0
+            if (ei != lr):
+                R[ei, ej] = Ri[ei, ej]
+            if (ei == lr):
+                R[ei, ej] = 0  # to target, not from
 
-  #target reward updated by the result of the real-time optimization process
-  #
-  #no G
-  rew=100
-  #G
-  if(crlmm==1):
-    rew=50
-  R[lr,lr]=rew
-  print("Initial Reward matrix with vertex locations:",R)
-#_____END OF GAP OPTIMIZATION PROCESS
-  agent_s_state = 1 #can be random
-  # Get available actions in the current state
-  PossibleAction = possible_actions(agent_s_state)
-  # Sample next action to be performed
-  action = ActionChoice(PossibleAction)
-  # Rewarding Q matrix
-  reward(agent_s_state,action,gamma)
-
-  for i in range(50000):
-    current_state = ql.random.randint(0, int(Q.shape[0]))
-    PossibleAction = possible_actions(current_state)
+    # target reward updated by the result of the real-time optimization process
+    #
+    # no G
+    rew = 100
+    # G
+    if (crlmm == 1):
+        rew = 50
+    R[lr, lr] = rew
+    print("Initial Reward matrix with vertex locations:", R)
+# _____END OF GAP OPTIMIZATION PROCESS
+    agent_s_state = 1  # can be random
+    # Get available actions in the current state
+    PossibleAction = possible_actions(agent_s_state)
+    # Sample next action to be performed
     action = ActionChoice(PossibleAction)
-    reward(current_state,action,gamma)
-  #CRL-MM #M
-  a=0 #super scan not activated
-  crlmm=CRLMM(Q,lr,e,a)
-  print("GAP =0 or GAP =1 status: ",crlmm)
-  ''' in parking lot available condition
+    # Rewarding Q matrix
+    reward(agent_s_state, action, gamma)
+
+    for i in range(50000):
+        current_state = ql.random.randint(0, int(Q.shape[0]))
+        PossibleAction = possible_actions(current_state)
+        action = ActionChoice(PossibleAction)
+        reward(current_state, action, gamma)
+    # CRL-MM #M
+    a = 0  # super scan not activated
+    crlmm = CRLMM(Q, lr, e, a)
+    print("GAP =0 or GAP =1 status: ", crlmm)
+    ''' in parking lot available condition
   if(crlmm==1):
       MDP_GRAPH(lr,e)
       print("Vertex Weights",W)
