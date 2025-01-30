@@ -1,6 +1,4 @@
 # Softmax function : normalized exponential function
-# Copyright 2019 Denis Rothman MIT License. See LICENSE.
-
 import math
 import numpy as np
 

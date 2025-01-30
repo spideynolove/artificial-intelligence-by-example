@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 # Decision Tree example for warehouse priority classification
-# Copyright 2019 Denis Rothman MIT License. See LICENSE.
 # import sklearn # for version check sklearn version 0.21.3
 # print("sklearn version",sklearn.__version__)
 
@@ -26,12 +25,14 @@ features = ['Priority/location', 'Volume', 'Flow_optimizer']
 Y = ['Low', 'Low', 'High', 'High', 'Low', 'Low']
 
 # 3. The data itself extracted from the result matrix
-X = [[256, 1, 0],
-     [320, 1, 0],
-     [500, 1, 1],
-     [400, 1, 0],
-     [320, 1, 0],
-     [256, 1, 0]]
+X = [
+    [256, 1, 0],
+    [320, 1, 0],
+    [500, 1, 1],
+    [400, 1, 0],
+    [320, 1, 0],
+    [256, 1, 0]
+]
 
 # 4. Running the standard inbuilt tree classifier
 classify = tree.DecisionTreeClassifier()
@@ -40,8 +41,7 @@ print(classify)
 
 # 5.Producing visualization(optional)
 
-info = tree.export_graphviz(
-    classify, feature_names=features, out_file=None, filled=True, rounded=True)
+info = tree.export_graphviz(classify, feature_names=features, out_file=None, filled=True, rounded=True)
 graph = pydotplus.graph_from_dot_data(info)
 
 edges = collections.defaultdict(list)

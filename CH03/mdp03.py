@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
-# Markov Decision Process (MDP) - The Bellman equations adapted to
-# Q Learning.Reinforcement Learning with the Q action-value(reward) function.
-# Copyright 2019 Denis Rothman MIT License. See LICENSE.
+# Markov Decision Process (MDP) - The Bellman equations adapted to Q Learning.Reinforcement Learning with the Q action-value(reward) function.
 import matplotlib.pyplot as plt
 import numpy as ql
+
 # R is The Reward Matrix for each state
 R = ql.matrix([[0, 0, 0, 0, 1, 0],
                [0, 0, 0, 1, 0, 1],
@@ -15,27 +14,27 @@ R = ql.matrix([[0, 0, 0, 0, 1, 0],
 # Q is the Learning Matrix in which rewards will be learned/stored
 Q = ql.matrix(ql.zeros([6, 6]))
 
-"""##  The Learning rate or training penalty"""
 
+"""##  The Learning rate or training penalty"""
 # Gamma : It's a form of penalty or uncertainty for learning
 # If the value is 1 , the rewards would be too high.
 # This way the system knows it is learning.
 gamma = 0.8
 
-"""## Initial State"""
 
+"""## Initial State"""
 # agent_s_state. The agent the name of the system calculating
 # s is the state the agent is going from and s' the state it's going to
 # this state can be random or it can be chosen as long as the rest of the choices
 # are not determined. Randomness is part of this stochastic process
 agent_s_state = 5
 
+
 """## The random choice of the next state"""
-
-# The possible "a" actions when the agent is in a given state
-
-
 def possible_actions(state):
+    """
+    The possible "a" actions when the agent is in a given state
+    """
     current_state_row = R[state,]
     possible_act = ql.where(current_state_row > 0)[1]
     return possible_act
@@ -44,11 +43,11 @@ def possible_actions(state):
 # Get available actions in the current state
 PossibleAction = possible_actions(agent_s_state)
 
-# This function chooses at random which action to be performed within the range
-# of all the available actions.
-
 
 def ActionChoice(available_actions_range):
+    """
+    This function chooses at random which action to be performed within the range of all the available actions.
+    """
     if (sum(PossibleAction) > 0):
         next_action = int(ql.random.choice(PossibleAction, 1))
     if (sum(PossibleAction) <= 0):
@@ -59,15 +58,14 @@ def ActionChoice(available_actions_range):
 # Sample next action to be performed
 action = ActionChoice(PossibleAction)
 
+
 """## The Bellman Equation"""
-
-# A version of the Bellman equation for reinforcement learning using the Q function
-# This reinforcement algorithm is a memoryless process
-# The transition function T from one state to another
-# is not in the equation below.  T is done by the random choice above
-
-
 def reward(current_state, action, gamma):
+    """
+    A version of the Bellman equation for reinforcement learning using the Q function
+    This reinforcement algorithm is a memoryless process
+    The transition function T from one state to another is not in the equation below.  T is done by the random choice above
+    """
     Max_State = ql.where(Q[action,] == ql.max(Q[action,]))[1]
 
     if Max_State.shape[0] > 1:
@@ -83,12 +81,10 @@ def reward(current_state, action, gamma):
 # Rewarding Q matrix
 reward(agent_s_state, action, gamma)
 
-"""## Running the training episodes randomly"""
 
+"""## Running the training episodes randomly"""
 # Learning over n iterations depending on the convergence of the system
-# A convergence function can replace the systematic repeating of the process
-# by comparing the sum of the Q matrix to that of Q matrix n-1 in the
-# previous episode
+# A convergence function can replace the systematic repeating of the process by comparing the sum of the Q matrix to that of Q matrix n-1 in the previous episode
 ci = 0          # convergence counter
 conv = 0        # sum of Q at state 1 and then every x episodes
 nc = 1          # numerical convergence activated

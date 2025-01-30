@@ -1,7 +1,4 @@
-# McCulloch Pitt Neuron built with Tensorflow and represented with
-# Tensorflow 2.0.0-beta1
-# Copyright 2019 Denis Rothman MIT License. See LICENSE.
-
+# McCulloch Pitt Neuron built with Tensorflow and represented with Tensorflow 2.0.0-beta1
 import tensorflow as tf
 import numpy as np
 import math

@@ -95,3 +95,63 @@ This directory contains implementations of fundamental neural network concepts:
   3. Numpy-based function
 - Includes one-hot encoding demonstration
 - Shows intermediate calculations for clarity
+
+## Deep Dive
+
+### Chapter Topics Explained  
+This chapter focuses on **preprocessing raw data into a reward matrix (R)** for Markov Decision Processes (MDPs) using neural network components. The pipeline transforms warehouse AGV (Automated Guided Vehicle) sensor data into a structured decision-making framework.  
+
+---
+
+#### **1. McCulloch-Pitts Neuron**  
+- **Role**: Processes raw input data (e.g., AGV sensor readings) into actionable signals.  
+- **Implementation** (`MCP.py`):  
+  - Inputs: Feature vector (e.g., `[10, 2, 1., 6., 2.]` for AGV speed, location, etc.).  
+  - Weights/Bias: Adjustable parameters to prioritize inputs.  
+  - **Logistic Sigmoid**: Squashes output into `[0,1]` to represent activation probability.  
+  - Example: High activation (`0.99999`) indicates AGV availability for task assignment.  
+
+---
+
+#### **2. Logistic Classifiers**  
+- **Purpose**: Begins neural processing by mapping inputs to probabilistic outputs.  
+- **Key Tool**: Logistic sigmoid ensures non-linearity and interpretability.  
+
+---
+
+#### **3. Softmax Function**  
+- **Role** (`SOFTMAX.py`): Normalizes raw scores (e.g., AGV route options) into a probability distribution.  
+  ```python
+  softmax(x) = exp(x) / Σ exp(x)  # Ensures outputs sum to 1
+  ```  
+- **Application**: Prioritizes AGV actions (e.g., choosing between storage zones).  
+
+---
+
+#### **4. One-Hot Encoding**  
+- **Purpose**: Selects the **highest-probability action** from softmax outputs.  
+  - Converts the maximum value to `1` and others to `0`.  
+  - Example: AGV picks the optimal path (e.g., `[0, 0, 1, 0, 0]`).  
+
+---
+
+#### **5. Reward Matrix (R) Construction**  
+- **Goal**: Maps valid AGV transitions (e.g., allowed paths between warehouse zones).  
+- **Process**:  
+  1. Neuron processes raw data into activations.  
+  2. Softmax normalizes activations into probabilities.  
+  3. One-hot encoding selects the best action.  
+  4. Actions populate R (e.g., `R[A][B] = 1` if AGV can move from A to B).  
+
+---
+
+#### **6. AGV Warehouse Example**  
+- **Challenge**: Preprocess sensor data (e.g., location, inventory levels) into R.  
+- **Outcome**: R defines valid AGV movements (e.g., `C→D` allowed, `C→A` blocked).  
+
+---
+
+### **Key Workflow**  
+**Raw Data** → **McCulloch-Pitts Neuron** → **Logistic Sigmoid** → **Softmax** → **One-Hot** → **Reward Matrix**  
+
+This pipeline ensures data standardization, critical for reliable MDP-based reinforcement learning in warehouse automation.
