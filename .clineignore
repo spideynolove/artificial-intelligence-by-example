@@ -1,0 +1,11 @@
+*.csv
+*.sav
+*.png
+*.ipynb
+*.bmp
+*.JPG
+*.tsv
+
+dataset
+dataset_*
+CH15
